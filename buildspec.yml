@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo Installing dependencies...
+      - cd aws-demo-sns
+      - npm install
+
+  build:
+    commands:
+      - echo Building Next.js app...
+      - npm run build
+      - npm run export
+
+artifacts:
+  base-directory: aws-demo-sns/out
+  files:
+    - '**/*'
