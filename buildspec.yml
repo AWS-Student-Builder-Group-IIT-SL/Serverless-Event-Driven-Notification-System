@@ -13,7 +13,6 @@ phases:
     commands:
       - echo Building Next.js app...
       - npm run build
-      - npm run export
 
 artifacts:
   base-directory: aws-demo-sns/out
