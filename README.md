@@ -6,3 +6,4 @@ This system is only developed for demostration purpose. we are planning to demos
 
 ## Demos 
 Step 01 - https://drive.google.com/file/d/1VHFykVaxSu0g7FSMJUMpZr0VSX3UYnV-/view?usp=sharing
+Step 02 - https://drive.google.com/file/d/1pq4fOFH9eFNHeLCiKnLihD4Q2Zioi2Dm/view?usp=sharing
