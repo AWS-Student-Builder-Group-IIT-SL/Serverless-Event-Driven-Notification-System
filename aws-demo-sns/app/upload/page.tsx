@@ -6,6 +6,7 @@ import userPool from "../cognitoConfig";
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -36,8 +37,52 @@ export default function UploadPage() {
       alert("Please select a file first.");
       return;
     }
-    // Simulate upload behavior
-    alert(`File ${file.name} uploaded successfully!`);
+    setUploading(true);
+
+    const cognitoUser = userPool.getCurrentUser();
+    if (cognitoUser != null) {
+      cognitoUser.getSession(async (err: any, session: any) => {
+        if (err || !session.isValid()) {
+          router.push("/login");
+          return;
+        }
+
+        const idToken = session.getIdToken().getJwtToken();
+
+        try {
+          const reader = new FileReader();
+          reader.onload = async (e) => {
+            const fileContent = e.target?.result as string;
+            const base64Content = fileContent.substring(fileContent.indexOf(',') + 1);
+
+            const response = await fetch("https://szus3jpd06.execute-api.us-east-1.amazonaws.com/prod/upload-files", {
+              method: "POST",
+              headers: {
+                "Authorization": idToken,
+                "Content-Type": "text/plain"
+              },
+              body: base64Content
+            });
+
+            if (response.ok) {
+              alert(`File ${file.name} uploaded successfully!`);
+              setFile(null);
+            } else {
+              const errData = await response.json().catch(() => ({}));
+              alert(`Upload failed: ${errData.message || response.statusText}`);
+            }
+            setUploading(false);
+          };
+          reader.readAsDataURL(file);
+        } catch (error) {
+          console.error("Upload error:", error);
+          alert("An error occurred during upload.");
+          setUploading(false);
+        }
+      });
+    } else {
+      router.push("/login");
+    }
   };
 
   return (
@@ -54,11 +99,11 @@ export default function UploadPage() {
           <label style={{ fontWeight: "bold" }}>Select a file to upload:</label>
           <input 
             type="file" 
-            onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} 
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFile(e.target.files ? e.target.files[0] : null)} 
             style={{ borderRadius: "0" }} 
           />
-          <button onClick={handleUpload} style={{ padding: "12px", backgroundColor: "#FF9900", color: "white", border: "none", borderRadius: "0", cursor: "pointer", fontWeight: "bold", fontSize: "16px" }}>
-            Upload File
+          <button onClick={handleUpload} disabled={uploading} style={{ padding: "12px", backgroundColor: uploading ? "#ccc" : "#FF9900", color: "white", border: "none", borderRadius: "0", cursor: uploading ? "not-allowed" : "pointer", fontWeight: "bold", fontSize: "16px" }}>
+            {uploading ? "Uploading..." : "Upload File"}
           </button>
         </div>
       </div>
