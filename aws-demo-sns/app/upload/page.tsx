@@ -55,7 +55,7 @@ export default function UploadPage() {
             const fileContent = e.target?.result as string;
             const base64Content = fileContent.substring(fileContent.indexOf(',') + 1);
 
-            const response = await fetch("https://szus3jpd06.execute-api.us-east-1.amazonaws.com/prod/upload-files", {
+            const response = await fetch("https://39fxg3twsd.execute-api.us-east-1.amazonaws.com/prod/upload", {
               method: "POST",
               headers: {
                 "Authorization": idToken,
